@@ -19,9 +19,15 @@ const App = () => {
     ];
 
     let index = 0;
+
     const streamInterval = setInterval(() => {
       if (index < contentStream.length) {
-        setStreamedContent(prev => [...prev, contentStream[index]]);
+        const newItem = contentStream[index];
+
+        if (newItem) {
+          setStreamedContent(prev => [...prev, newItem]);
+        }
+
         index++;
       } else {
         clearInterval(streamInterval);
@@ -35,10 +41,12 @@ const App = () => {
   useEffect(() => {
     const text = 'Real-time text streaming: 2 + 2 = 4, sqrt(16) = 4... ';
     let index = 0;
-    
+    let temp = ''
+
     const textInterval = setInterval(() => {
       if (index < text.length) {
-        setCurrentStream(prev => prev + text.charAt(index));
+        temp += text.charAt(index)
+        setCurrentStream(temp);
         index++;
       } else {
         clearInterval(textInterval);
@@ -49,7 +57,9 @@ const App = () => {
   }, []);
 
   const renderContent = (content) => {
-    switch(content.type) {
+    if (!content || !content.type) return null;
+
+    switch (content.type) {
       case 'code':
         return (
           <SyntaxHighlighter language="python" style={docco}>
@@ -58,7 +68,7 @@ const App = () => {
         );
       case 'math':
         return (
-          <div 
+          <div
             dangerouslySetInnerHTML={{
               __html: Katex.renderToString(content.content, {
                 throwOnError: false
@@ -74,7 +84,7 @@ const App = () => {
   return (
     <div className="App" style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
       <h1>AI Content Rendering Test</h1>
-      
+
       <section style={{ margin: '40px 0' }}>
         <h2>Streamed Content</h2>
         {streamedContent.map((content, index) => (
@@ -86,9 +96,9 @@ const App = () => {
 
       <section style={{ margin: '40px 0' }}>
         <h2>Real-time Text Stream</h2>
-        <div style={{ 
-          border: '1px solid #ccc', 
-          padding: '15px', 
+        <div style={{
+          border: '1px solid #ccc',
+          padding: '15px',
           minHeight: '60px',
           whiteSpace: 'pre-wrap',
           fontFamily: 'monospace'
